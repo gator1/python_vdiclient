@@ -145,7 +145,7 @@ class SecretsHelper(object):
         value = "|".join([str(auth_token),
                           str(management_url),
                           str(tenant_id)])
-        keyring.set_password("saharaclient_auth", self._make_key(), value)
+        keyring.set_password("vdiclient_auth", self._make_key(), value)
 
     @property
     def password(self):
@@ -161,7 +161,7 @@ class SecretsHelper(object):
             return None
         management_url = None
         try:
-            block = keyring.get_password('saharaclient_auth',
+            block = keyring.get_password('vdiclient_auth',
                                          self._make_key())
             if block:
                 _token, management_url, _tenant_id = block.split('|', 2)
@@ -347,9 +347,9 @@ class OpenStackVDIShell(object):
         parser.add_argument('--endpoint-type',
                             metavar='<endpoint-type>',
                             default=cliutils.env(
-                                'SAHARA_ENDPOINT_TYPE',
+                                'VDI_ENDPOINT_TYPE',
                                 default=DEFAULT_ENDPOINT_TYPE),
-                            help='Defaults to env[SAHARA_ENDPOINT_TYPE] or '
+                            help='Defaults to env[VDI_ENDPOINT_TYPE] or '
                             + DEFAULT_ENDPOINT_TYPE + '.')
         # NOTE(dtroyer): We can't add --endpoint_type here due to argparse
         #                thinking usage-list --end is ambiguous; but it
@@ -436,7 +436,7 @@ class OpenStackVDIShell(object):
 
     def _discover_via_python_path(self):
         for (module_loader, name, _ispkg) in pkgutil.iter_modules():
-            if name.endswith('_python_saharaclient_ext'):
+            if name.endswith('_python_vdiclient_ext'):
                 if not hasattr(module_loader, 'load_module'):
                     # Python 2.6 compat: actually get an ImpImporter obj
                     module_loader = module_loader.find_module(name)
@@ -690,7 +690,7 @@ class OpenStackVDIShell(object):
                                 project_id=os_tenant_id,
                                 project_name=os_tenant_name,
                                 auth_url=os_auth_url,
-                                sahara_url=bypass_url)
+                                vdi_url=bypass_url)
 
         args.func(self.cs, args)
 
@@ -717,7 +717,7 @@ class OpenStackVDIShell(object):
 
     def do_bash_completion(self, _args):
         """Prints all of the commands and options to stdout so that the
-        sahara.bash_completion script doesn't have to hard code them.
+        vdi.bash_completion script doesn't have to hard code them.
         """
         commands = set()
         options = set()

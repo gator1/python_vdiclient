@@ -145,7 +145,16 @@ class Manager(utils.HookableMixin):
 
     def _create(self, url, body, response_key, return_raw=False, **kwargs):
         self.run_hooks('modify_body_for_create', body, **kwargs)
-        _resp, body = self.api.client.post(url, body=body)
+        # _resp, body = self.api.client.post(url, body=body)
+        _resp = self.api.client.post(url, body=body)
+
+        ######
+        print("url={0}".format(url))
+        print("_resp={0}".format(_resp))
+        print("body={0}".format(body))
+        raw_input("nova_create")
+        ######
+
         if return_raw:
             return body[response_key]
 
@@ -171,7 +180,7 @@ class ManagerWithFind(Manager):
     """Like a `Manager`, but with additional `find()`/`findall()` methods.
     """
 
-    @abc.abstractmethod
+    # @abc.abstractmethod
     def list(self):
         pass
 
@@ -396,6 +405,10 @@ class BootingManagerWithFind(ManagerWithFind):
 
         if disk_config is not None:
             body['server']['OS-DCF:diskConfig'] = disk_config
+
+        print resource_url
+        print body
+        raw_input("nova_boot")
 
         return self._create(resource_url, body, response_key,
                             return_raw=return_raw, **kwargs)

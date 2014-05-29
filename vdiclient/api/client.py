@@ -27,12 +27,16 @@ from vdiclient.api import job_executions
 from vdiclient.api import jobs
 from vdiclient.api import node_group_templates
 from vdiclient.api import plugins
+from vdiclient.api import test_vm as vm
+from vdiclient.api import groups
 
 
 class Client(object):
     def __init__(self, username=None, api_key=None, project_id=None,
-                 project_name=None, auth_url=None, sahara_url=None,
-                 endpoint_type='publicURL', service_type='data_processing',
+                 project_name=None, auth_url=None, vdi_url=None,
+                 # 04/01/2014 - change service_type to 'identity'
+                 # endpoint_type='publicURL', service_type='data_processing',
+                 endpoint_type='publicURL', service_type='compute',
                  input_auth_token=None):
 
         if not input_auth_token:
@@ -42,11 +46,13 @@ class Client(object):
                                                 project_id=project_id,
                                                 project_name=project_name)
             input_auth_token = keystone.auth_token
+            # print debugging info
+            # print("input_auth_token={}".format(keystone.auth_token))
         if not input_auth_token:
             raise RuntimeError("Not Authorized")
 
-        sahara_catalog_url = sahara_url
-        if not sahara_url:
+        vdi_catalog_url = vdi_url
+        if not vdi_url:
             keystone = self.get_keystone_client(username=username,
                                                 api_key=api_key,
                                                 auth_url=auth_url,
@@ -54,16 +60,31 @@ class Client(object):
                                                 project_id=project_id,
                                                 project_name=project_name)
             catalog = keystone.service_catalog.get_endpoints(service_type)
+            # print debugging info
+            # print("catalog={0}".format(catalog))
             if service_type in catalog:
                 for e_type, endpoint in catalog.get(service_type)[0].items():
                     if str(e_type).lower() == str(endpoint_type).lower():
-                        sahara_catalog_url = endpoint
-                        break
-        if not sahara_catalog_url:
-            raise RuntimeError("Could not find Sahara endpoint in catalog")
+                        vdi_catalog_url = endpoint
+                        # 4/17/2014 - Ching, hack the url with vdi endpoint
+                        if vdi_catalog_url:
+                            import re
 
-        self.client = httpclient.HTTPClient(sahara_catalog_url,
-                                            input_auth_token)
+                            sptn = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\:\d+\/\S*\/')
+                            vdi_catalog_url = re.sub(sptn, "127.0.0.1:9000/v1.0/", vdi_catalog_url)
+                        # end of hack
+                        break
+        print("vdi_catalog_url={0}".format(vdi_catalog_url))
+        if not vdi_catalog_url:
+            raise RuntimeError("Could not find VDI endpoint in catalog")
+
+        self.client = httpclient.HTTPClient(vdi_catalog_url, input_auth_token)
+
+        # 4/2/2014, Ching - add vm
+        self.vm = vm.VMManager(self)
+
+        # 4/17/2014, Ching - add group
+        self.groups = groups.GroupManager(self)
 
         self.clusters = clusters.ClusterManager(self)
         self.cluster_templates = cluster_templates.ClusterTemplateManager(self)
@@ -76,7 +97,7 @@ class Client(object):
         self.jobs = jobs.JobsManager(self)
         self.job_executions = job_executions.JobExecutionsManager(self)
         self.job_binaries = job_binaries.JobBinariesManager(self)
-        self.job_binary_internals =\
+        self.job_binary_internals = \
             job_binary_internals.JobBinaryInternalsManager(self)
 
     def get_keystone_client(self, username=None, api_key=None, auth_url=None,

@@ -102,6 +102,95 @@ def _get_by_id_or_name(manager, id=None, name=None):
 
 
 #
+# VDI subcommands
+# ~~~~~~~~~~~~~~~
+# user-list
+#
+# category-list
+#
+# vm-create [--json <file>]
+#
+
+#
+# Groups
+# ~~~~~~~
+# group-create [--json <file>]
+#
+# group-list
+#
+# group-show --name <group>|--id <group_id> [--json]
+#
+
+@utils.arg('--json',
+           default=sys.stdin,
+           type=argparse.FileType('r'),
+           help='JSON representation of VM.')
+def do_group_create(cs, args):
+    """
+    Create a group.
+    """
+    # print "args=%s" % args
+    template = json.loads(args.json.read())
+
+    # print template
+    cs.groups.create(**template)
+
+
+def do_group_list(cs, args):
+    """Print a list of groups."""
+    groups = cs.groups.list()
+    columns = ('name', 'id', 'description')
+    utils.print_list(groups, columns,
+                     {'groups': _print_list_field('groups')})
+
+
+# def do_user_list(cs, args):
+#     """
+#     Print a list of vdi users.
+#     """
+#     from pprint import pprint
+#     pprint(args)
+#     print(type(args))
+#     print("cs={}".format(cs))
+#     print("test do_user_list")
+#     pass
+
+
+# def do_category_list(cs, args):
+#     """
+#     Print a list of vdi categories.
+#     """
+#     pass
+
+
+@utils.arg('--json',
+           default=sys.stdin,
+           type=argparse.FileType('r'),
+           help='JSON representation of VM.')
+def do_vm_create(cs, args):
+    """
+    Create a virtual machine.
+    """
+    # cs.vm.create("test", "test", "test")
+    template = json.loads(args.json.read())
+#     # The neutron_management_network parameter to clusters.create is
+#     # called net_id. Therefore, we must translate before invoking
+#     # create w/ **template. It may be desirable to simple change
+#     # clusters.create in the future.
+#     template['net_id'] = template.get('neutron_management_network', None)
+#     valid_args = inspect.getargspec(cs.clusters.create).args
+#     for name in template.keys():
+#         if name not in valid_args:
+#             # TODO(mattf): make this verbose - bug/1271147
+#             del template[name]
+#     _show_cluster(cs.clusters.create(**template))
+
+    # print template
+    # raw_input("do_vm_create")
+    cs.vm.create(**template)
+
+
+#
 # Plugins
 # ~~~~~~~
 # plugin-list
@@ -115,8 +204,8 @@ def _get_by_id_or_name(manager, id=None, name=None):
 #     columns = ('name', 'versions', 'title')
 #     utils.print_list(plugins, columns,
 #                      {'versions': _print_list_field('versions')})
-#
-#
+
+
 # @utils.arg('--name',
 #            metavar='<plugin>',
 #            required=True,
@@ -155,6 +244,17 @@ def _get_by_id_or_name(manager, id=None, name=None):
 #     images = cs.images.list()
 #     columns = ('name', 'id', 'username', 'tags', 'description')
 #     utils.print_list(images, columns, {'tags': _print_list_field('tags')})
+# @utils.arg('--name',
+#            help='Name of the cluster.')
+# @utils.arg('--id',
+#            metavar='<cluster_id>',
+#            help='ID of the cluster to delete.')
+# def do_cluster_delete(cs, args):
+#     """Delete a cluster."""
+#     cs.clusters.delete(
+#         args.id or _get_by_id_or_name(cs.clusters, name=args.name).id
+#     )
+#     # TODO(mattf): No indication of result
 
 
 # @utils.arg('--name',
