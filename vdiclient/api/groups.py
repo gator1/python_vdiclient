@@ -45,5 +45,8 @@ class GroupManager(base.ResourceManager):
     def get(self, group_id):
         return self._get('/groups/%s' % group_id, 'group')
 
-    # def delete(self, cluster_id):
-    #     self._delete('/clusters/%s' % cluster_id)
+    def delete(self, group_id):
+        self._delete('/groups/%s' % group_id)
+
+    def get_image(self, group_id):
+        return self._list('/images?group_id=%s' % group_id, 'images')

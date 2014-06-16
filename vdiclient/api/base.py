@@ -109,7 +109,6 @@ class ResourceManager(object):
 
     def _get(self, url, response_key=None):
         resp = self.api.client.get(url)
-
         if resp.status_code == 200:
             if response_key is not None:
                 data = get_json(resp)[response_key]
