@@ -28,9 +28,9 @@ class HTTPClient(object):
     def post(self, url, body):
         #####
         # print self.token
-        print "self.base_url = %s" % self.base_url
-        print "self.base_url + url = %s", self.base_url + url
-        print body
+        # print "self.base_url = %s" % self.base_url
+        # print "self.base_url + url = %s", self.base_url + url
+        # print body
         # raw_input("httpclient_post")
         #####
 

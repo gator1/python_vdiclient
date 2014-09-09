@@ -29,6 +29,7 @@ from vdiclient.api import node_group_templates
 from vdiclient.api import plugins
 from vdiclient.api import test_vm as vm
 from vdiclient.api import groups
+from vdiclient.api import pools
 
 
 class Client(object):
@@ -83,8 +84,10 @@ class Client(object):
         # 4/2/2014, Ching - add vm
         self.vm = vm.VMManager(self)
 
-        # 4/17/2014, Ching - add group
+        # 4/17/2014, Ching - add groups
         self.groups = groups.GroupManager(self)
+        # 8/21/2014, Ching - add pools
+        self.pools = pools.PoolManager(self)
 
         self.clusters = clusters.ClusterManager(self)
         self.cluster_templates = cluster_templates.ClusterTemplateManager(self)

@@ -45,8 +45,26 @@ class GroupManager(base.ResourceManager):
     def get(self, group_id):
         return self._get('/groups/%s' % group_id, 'group')
 
+    def update(self, group_id, data):
+        return self._update('/groups/%s' % group_id, data, 'group')
+
     def delete(self, group_id):
         self._delete('/groups/%s' % group_id)
 
-    def get_image(self, group_id):
-        return self._list('/images?group_id=%s' % group_id, 'images')
+    # def get_images(self, group_id):
+    #     return self._list('/images?group_id=%s' % group_id, 'images')
+    #
+    # def get_pools(self, group_id):
+    #     return self._list('/pools?group_id=%s' % group_id, 'pools')
+    #
+    # def get_users(self, group_id):
+    #     return self._list('/users?group_id=%s' % group_id, 'users')
+
+    def create_assignment(self, tenant_id, user_id, group_id):
+        data = {
+            'actor_id': user_id,
+            'target_id': tenant_id,
+            'group_id': group_id
+        }
+
+        return self._create('/users/%s/groups/%s' % (user_id, group_id), data, 'assignment')
