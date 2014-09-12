@@ -55,7 +55,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Sahara Client'
+project = u'VDI Client'
+# project = u'Sahara Client'
 copyright = u'2013, OpenStack Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
