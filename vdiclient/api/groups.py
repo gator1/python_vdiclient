@@ -73,7 +73,7 @@ class GroupManager(base.ResourceManager):
             'user_id': user_id,
             'group_id': group_id
         }
-        return self._update('/users/%s/groups/%s' % (user_id, group_id), data, 'membership')
+        return self._update('/users/%s/groups/%s' % (user_id, group_id), data, 'group_membership')
 
     def list_user_groups(self, user_id):
         return self._list('/users/%s/groups' % user_id, 'groups')

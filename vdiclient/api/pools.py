@@ -54,3 +54,5 @@ class PoolManager(base.ResourceManager):
     def get_image(self, pool_id):
         return self._list('/images?group_id=%s' % pool_id, 'images')
 
+    def list_group_pools(self, group_id):
+        return self._list('/groups/%s/pools' % group_id, 'pools')
