@@ -119,6 +119,8 @@ class Client(object):
                 auth_url=auth_url,
                 endpoint=auth_url)
 
+        import pdb; pdb.set_trace()
+
         self.keystone_client.authenticate()
 
         return self.keystone_client
