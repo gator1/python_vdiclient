@@ -33,49 +33,66 @@ from vdiclient.api import pools
 
 
 class Client(object):
-    def __init__(self, username=None, api_key=None, project_id=None,
-                 project_name=None, auth_url=None, vdi_url=None,
-                 # 04/01/2014 - change service_type to 'identity'
-                 # endpoint_type='publicURL', service_type='data_processing',
-                 endpoint_type='publicURL', service_type='compute',
+    def __init__(self, username=None, api_key=None, domain_name=None,
+                 project_id=None,project_name=None, auth_url=None,
+                 vdi_url=None, endpoint_type='publicURL', service_type='vdi',
                  input_auth_token=None):
 
         if not input_auth_token:
-            keystone = self.get_keystone_client(username=username,
+            keystone = self.get_keystone_client(domain_name=domain_name,
+                                                username=username,
                                                 api_key=api_key,
                                                 auth_url=auth_url,
                                                 project_id=project_id,
                                                 project_name=project_name)
             input_auth_token = keystone.auth_token
-            # print debugging info
-            # print("input_auth_token={}".format(keystone.auth_token))
+
+        # import pdb; pdb.set_trace()
+
         if not input_auth_token:
             raise RuntimeError("Not Authorized")
 
         vdi_catalog_url = vdi_url
         if not vdi_url:
-            keystone = self.get_keystone_client(username=username,
+
+            # import pdb; pdb.set_trace()
+
+            keystone = self.get_keystone_client(user_domain_name=domain_name,
+                                                username=username,
                                                 api_key=api_key,
                                                 auth_url=auth_url,
                                                 token=input_auth_token,
                                                 project_id=project_id,
                                                 project_name=project_name)
             catalog = keystone.service_catalog.get_endpoints(service_type)
-            # print debugging info
-            # print("catalog={0}".format(catalog))
-            if service_type in catalog:
-                for e_type, endpoint in catalog.get(service_type)[0].items():
-                    if str(e_type).lower() == str(endpoint_type).lower():
-                        vdi_catalog_url = endpoint
-                        # 4/17/2014 - Ching, hack the url with vdi endpoint
-                        if vdi_catalog_url:
-                            import re
 
-                            sptn = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\:\d+\/\S*\/')
-                            vdi_catalog_url = re.sub(sptn, "127.0.0.1:9000/v1.0/", vdi_catalog_url)
-                        # end of hack
-                        break
-        print("vdi_catalog_url={0}".format(vdi_catalog_url))
+            if service_type in catalog:
+                if keystone.version == "v3":
+                    vdi_endpoints = catalog[service_type]
+                    for e in vdi_endpoints:
+                        if str(e['interface']).lower() in str(endpoint_type).lower():
+                            vdi_catalog_url = e['url']
+                            break
+                else:
+                    for e_type, endpoint in catalog.get(service_type)[0].items():
+                        if str(e_type).lower() == str(endpoint_type).lower():
+                            vdi_catalog_url = endpoint
+                            # 4/17/2014 - Ching, hack the url with vdi endpoint
+                            # if vdi_catalog_url:
+                            #     import re
+                            #
+                            #     sptn = re.compile(r'\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\:\d+\/\S*\/')
+                            #     vdi_catalog_url = re.sub(sptn, "127.0.0.1:9000/v1.0/", vdi_catalog_url)
+                            # end of hack
+                            break
+
+        # import pdb; pdb.set_trace()
+
+        # try:
+        #     vdi_catalog_url
+        # except NameError:
+        #     vdi_catalog_url = vdi_url
+
         if not vdi_catalog_url:
             raise RuntimeError("Could not find VDI endpoint in catalog")
 
@@ -103,14 +120,28 @@ class Client(object):
         self.job_binary_internals = \
             job_binary_internals.JobBinaryInternalsManager(self)
 
-    def get_keystone_client(self, username=None, api_key=None, auth_url=None,
-                            token=None, project_id=None, project_name=None):
+    def get_keystone_client(self, user_domain_name=None, username=None,
+                            api_key=None, auth_url=None, token=None,
+                            project_id=None, project_name=None):
         if not auth_url:
                 raise RuntimeError("No auth url specified")
-        imported_client = keystone_client_v2 if "v2.0" in auth_url\
-            else keystone_client_v3
-        if not getattr(self, "keystone_client", None):
-            self.keystone_client = imported_client.Client(
+        # imported_client = keystone_client_v2 if "v2.0" in auth_url\
+        #     else keystone_client_v3
+        # if not getattr(self, "keystone_client", None):
+        #     self.keystone_client = imported_client.Client(
+        #         username=username,
+        #         password=api_key,
+        #         token=token,
+        #         tenant_id=project_id,
+        #         tenant_name=project_name,
+        #         # project_id=project_id,
+        #         # project_name=project_name,
+        #         auth_url=auth_url,
+        #         endpoint=auth_url)
+
+        if "2.0" in auth_url:
+            # if not getattr(self, "keystone_client", None):
+            self.keystone_client = keystone_client_v2.Client(
                 username=username,
                 password=api_key,
                 token=token,
@@ -118,6 +149,12 @@ class Client(object):
                 tenant_name=project_name,
                 auth_url=auth_url,
                 endpoint=auth_url)
+        else:
+            self.keystone_client = keystone_client_v3.Client(
+                auth_url=auth_url,
+                token=token,
+                project_id=project_id,
+                project_name=project_name)
 
         self.keystone_client.authenticate()
 
