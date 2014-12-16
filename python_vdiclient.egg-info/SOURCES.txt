@@ -3,7 +3,10 @@ LICENSE
 MANIFEST.in
 README.md
 README.rst
+<<<<<<< HEAD
 group.json
+=======
+>>>>>>> 3c2200ce3f17f8b610d385dae9bf4db8df0b5860
 openstack-common.conf
 requirements.txt
 run_tests.sh
@@ -38,11 +41,15 @@ tools/install_venv_common.py
 tools/with_venv.sh
 vdiclient/__init__.py
 vdiclient/client.py
+<<<<<<< HEAD
 vdiclient/create_vm.sh
 vdiclient/shell.py
 vdiclient/test.json
 vdiclient/test.sh
 vdiclient/test_cluster.json
+=======
+vdiclient/shell.py
+>>>>>>> 3c2200ce3f17f8b610d385dae9bf4db8df0b5860
 vdiclient/version.py
 vdiclient/api/__init__.py
 vdiclient/api/base.py
@@ -50,7 +57,10 @@ vdiclient/api/client.py
 vdiclient/api/cluster_templates.py
 vdiclient/api/clusters.py
 vdiclient/api/data_sources.py
+<<<<<<< HEAD
 vdiclient/api/groups.py
+=======
+>>>>>>> 3c2200ce3f17f8b610d385dae9bf4db8df0b5860
 vdiclient/api/helpers.py
 vdiclient/api/httpclient.py
 vdiclient/api/images.py
@@ -61,9 +71,13 @@ vdiclient/api/jobs.py
 vdiclient/api/node_group_templates.py
 vdiclient/api/parameters.py
 vdiclient/api/plugins.py
+<<<<<<< HEAD
 vdiclient/api/pools.py
 vdiclient/api/shell.py
 vdiclient/api/test_vm.py
+=======
+vdiclient/api/shell.py
+>>>>>>> 3c2200ce3f17f8b610d385dae9bf4db8df0b5860
 vdiclient/nova/__init__.py
 vdiclient/nova/auth_plugin.py
 vdiclient/nova/base.py

@@ -156,6 +156,8 @@ class Client(object):
                 project_id=project_id,
                 project_name=project_name)
 
+        # import pdb; pdb.set_trace()
+
         self.keystone_client.authenticate()
 
         return self.keystone_client
