@@ -32,11 +32,10 @@ class PoolManager(base.ResourceManager):
                 raise base.APIException('Pool is missing field "%s"' %
                                         var_name)
 
-    def create(self, name, description):
-        data = {
-            'name': name,
-            'description': description
-        }
+    def create(self, domain_id, name, description):
+        data = {'domain_id': domain_id,
+                'name': name,
+                'description': description}
         return self._create('/pools', data, 'pool')
 
     def list(self):
@@ -56,3 +55,6 @@ class PoolManager(base.ResourceManager):
 
     def list_group_pools(self, group_id):
         return self._list('/groups/%s/pools' % group_id, 'pools')
+
+    def list_domain_pools(self, domain_id):
+        return self._list('/domains/%s/pools' % domain_id, 'pools')

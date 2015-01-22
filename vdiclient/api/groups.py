@@ -32,11 +32,10 @@ class GroupManager(base.ResourceManager):
                 raise base.APIException('Group is missing field "%s"' %
                                         var_name)
 
-    def create(self, name, description):
-        data = {
-            'name': name,
-            'description': description
-        }
+    def create(self, domain_id, name, description):
+        data = {'domain_id': domain_id,
+                'name': name,
+                'description': description}
         return self._create('/groups', data, 'group')
 
     def list(self):
@@ -77,3 +76,6 @@ class GroupManager(base.ResourceManager):
 
     def list_user_groups(self, user_id):
         return self._list('/users/%s/groups' % user_id, 'groups')
+
+    def list_domain_groups(self, domain_id):
+        return self._list('/domains/%s/groups' % domain_id, 'groups')

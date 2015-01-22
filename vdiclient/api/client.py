@@ -38,6 +38,8 @@ class Client(object):
                  vdi_url=None, endpoint_type='publicURL', service_type='vdi',
                  input_auth_token=None):
 
+        # import pdb; pdb.set_trace()
+
         if not input_auth_token:
             keystone = self.get_keystone_client(domain_name=domain_name,
                                                 username=username,
@@ -47,16 +49,11 @@ class Client(object):
                                                 project_name=project_name)
             input_auth_token = keystone.auth_token
 
-        # import pdb; pdb.set_trace()
-
         if not input_auth_token:
             raise RuntimeError("Not Authorized")
 
         vdi_catalog_url = vdi_url
         if not vdi_url:
-
-            # import pdb; pdb.set_trace()
-
             keystone = self.get_keystone_client(user_domain_name=domain_name,
                                                 username=username,
                                                 api_key=api_key,
@@ -86,8 +83,6 @@ class Client(object):
                             # end of hack
                             break
 
-        # import pdb; pdb.set_trace()
-
         # try:
         #     vdi_catalog_url
         # except NameError:
@@ -97,10 +92,10 @@ class Client(object):
             raise RuntimeError("Could not find VDI endpoint in catalog")
 
         self.client = httpclient.HTTPClient(vdi_catalog_url, input_auth_token)
+        self.keystone_client = None
 
         # 4/2/2014, Ching - add vm
         self.vm = vm.VMManager(self)
-
         # 4/17/2014, Ching - add groups
         self.groups = groups.GroupManager(self)
         # 8/21/2014, Ching - add pools
@@ -108,11 +103,9 @@ class Client(object):
 
         self.clusters = clusters.ClusterManager(self)
         self.cluster_templates = cluster_templates.ClusterTemplateManager(self)
-        self.node_group_templates = (node_group_templates.
-                                     NodeGroupTemplateManager(self))
+        self.node_group_templates = (node_group_templates. NodeGroupTemplateManager(self))
         self.plugins = plugins.PluginManager(self)
         self.images = images.ImageManager(self)
-
         self.data_sources = data_sources.DataSourceManager(self)
         self.jobs = jobs.JobsManager(self)
         self.job_executions = job_executions.JobExecutionsManager(self)
