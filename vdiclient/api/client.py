@@ -37,21 +37,20 @@ class Client(object):
                  project_id=None,project_name=None, auth_url=None,
                  vdi_url=None, endpoint_type='publicURL', service_type='vdi',
                  input_auth_token=None):
-
-        # import pdb; pdb.set_trace()
-
         if not input_auth_token:
-            keystone = self.get_keystone_client(domain_name=domain_name,
+            keystone = self.get_keystone_client(user_domain_name=domain_name,
                                                 username=username,
                                                 api_key=api_key,
                                                 auth_url=auth_url,
                                                 project_id=project_id,
                                                 project_name=project_name)
+
+            # import pdb; pdb.set_trace()
+
             input_auth_token = keystone.auth_token
 
         if not input_auth_token:
             raise RuntimeError("Not Authorized")
-
         vdi_catalog_url = vdi_url
         if not vdi_url:
             keystone = self.get_keystone_client(user_domain_name=domain_name,
@@ -132,6 +131,8 @@ class Client(object):
         #         auth_url=auth_url,
         #         endpoint=auth_url)
 
+        # import pdb; pdb.set_trace()
+
         if "2.0" in auth_url:
             # if not getattr(self, "keystone_client", None):
             self.keystone_client = keystone_client_v2.Client(
@@ -144,12 +145,13 @@ class Client(object):
                 endpoint=auth_url)
         else:
             self.keystone_client = keystone_client_v3.Client(
+                user_domain_name=user_domain_name,
+                username=username,
+                password=api_key,
                 auth_url=auth_url,
                 token=token,
                 project_id=project_id,
                 project_name=project_name)
-
-        # import pdb; pdb.set_trace()
 
         self.keystone_client.authenticate()
 
